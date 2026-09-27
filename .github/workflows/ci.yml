@@ -1,0 +1,82 @@
+name: Go example
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      transport_ref:
+        description: Explicit VGI Go revision with safe network entrypoint (empty uses published dependency)
+        required: false
+        default: ''
+permissions:
+  contents: read
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: grainlift-hello-world-go
+      - uses: actions/checkout@v4
+        with:
+          repository: Query-farm/grainlift-go
+          path: grainlift-go
+      - uses: actions/checkout@v4
+        with:
+          repository: Query-farm/grainlift
+          path: grainlift
+      - uses: actions/checkout@v4
+        with:
+          repository: Query-farm/vgi-rpc-rust
+          ref: e60c342c2ae86730abe7a863f79cbd11f2f89910 # v0.27.3
+          path: vgi-rpc-rust
+      - uses: actions/checkout@v4
+        if: inputs.transport_ref != ''
+        with:
+          repository: Query-farm/vgi-rpc-go
+          ref: ${{ inputs.transport_ref }}
+          path: vgi-rpc-go
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache-dependency-path: grainlift-go/go.sum
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
+        with:
+          toolchain: 1.97.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: go work init ./grainlift-go ./grainlift-hello-world-go
+      - name: Explicit development transport integration
+        if: inputs.transport_ref != ''
+        run: go work use ./vgi-rpc-go
+      - name: Require raw transport capability
+        if: inputs.transport_ref != ''
+        run: GRAINLIFT_REQUIRE_NETWORK=1 GRAINLIFT_REQUIRE_CANONICAL_HEADER=1 go test -race ./...
+        working-directory: grainlift-go
+      - run: go test -race ./... && go vet ./... && test -z "$(gofmt -l *.go)" && go build -o ../hello-go .
+        working-directory: grainlift-hello-world-go
+      - run: cargo build --locked --release -p adbc-driver-grainlift
+        working-directory: grainlift
+      - name: Build explicit Iroh bridge release
+        run: cargo build --locked --release -p vgi-iroh-bridge
+        working-directory: vgi-rpc-rust
+      - run: python -m pip install pytest==9.1.1 pyarrow==25.0.1 adbc-driver-manager==1.12.0 cryptography==50.0.1
+      - name: Private TLS fixtures
+        run: bash validation/diagnostics/make_test_tls.sh "$RUNNER_TEMP/grainlift-tls"
+        working-directory: grainlift
+      - name: Native ADBC conformance on every transport
+        env:
+          TRANSPORT_REF: ${{ inputs.transport_ref }}
+        run: |
+          transports='http https'
+          if [ -n "$TRANSPORT_REF" ]; then transports='http https tcp mtls iroh'; fi
+          for transport in $transports; do
+            python -m pytest validation/conformance -q \
+              --worker-command '["../hello-go"]' \
+              --native-driver target/release/libadbc_driver_grainlift.so \
+              --worker-transport "$transport" \
+              --worker-tls-dir "$RUNNER_TEMP/grainlift-tls" \
+              --iroh-bridge ../vgi-rpc-rust/target/release/vgi-iroh-bridge
+          done
+        working-directory: grainlift
