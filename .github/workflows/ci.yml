@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Query-farm/grainlift
-          ref: codex/worker-lifecycle-conformance
+          ref: main
           path: grainlift
       - uses: actions/checkout@v4
         with:
