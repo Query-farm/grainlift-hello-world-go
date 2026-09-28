@@ -27,7 +27,16 @@ func bridgeFixture(t *testing.T, script string) (*grainlift.Service, string) {
 		}
 		t.Skip("requires upstream network safety patch")
 	}
-	directory := t.TempDir()
+	// Keep the bridge socket path below the Unix domain socket limit on macOS.
+	base := os.TempDir()
+	if info, err := os.Stat("/tmp"); err == nil && info.IsDir() {
+		base = "/tmp"
+	}
+	directory, e := os.MkdirTemp(base, "gl-")
+	if e != nil {
+		t.Fatal(e)
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(directory) })
 	t.Setenv("TMPDIR", directory)
 	bridge := filepath.Join(directory, "bridge")
 	if e := os.WriteFile(bridge, []byte("#!/bin/sh\n"+script), 0700); e != nil {
