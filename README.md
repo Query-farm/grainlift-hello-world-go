@@ -6,8 +6,8 @@ A runnable Go worker built with [grainlift-go](https://github.com/Query-farm/gra
 
 HTTP, HTTPS, loopback TCP, mTLS TCP, and Iroh use published
 [VGI Go v0.30.0](https://github.com/Query-farm/vgi-rpc-go/releases/tag/v0.30.0),
-which includes the network-safe serving entrypoint. The example still uses a
-Go workspace when developing against the sibling Grainlift Go SDK.
+which includes the network-safe serving entrypoint. The example pins the
+[Grainlift Go SDK v0.1.0](https://github.com/Query-farm/grainlift-go/releases/tag/v0.1.0).
 
 The synthetic backend supports `QUERY`, `FAIL`, schema inference, and autocommit. Transactions, preparation, binding, metadata, and other optional capabilities return ADBC `NOT_IMPLEMENTED`. The SDK has positive fixture coverage for those hooks; this example is not a database or a production certification.
 
@@ -16,8 +16,8 @@ The example tests keep two independent connections and cursors open together, th
 ## Quickstart
 
 Requires Go 1.26 or newer and OpenSSL for the token-generation command. Use a
-fresh workspace to develop against the sibling SDK; `go.mod` records a specific
-SDK commit for standalone reproducibility:
+fresh workspace to develop against the sibling SDK; `go.mod` pins the released
+SDK for standalone reproducibility:
 
 ```sh
 mkdir grainlift-go-workspace
