@@ -3,7 +3,7 @@ module github.com/Query-farm/grainlift-hello-world-go
 go 1.26.0
 
 require (
-	github.com/Query-farm/grainlift-go v0.0.0-20260927034910-4a9284c49365
+	github.com/Query-farm/grainlift-go v0.0.0-20260928043706-292290e804d7
 	github.com/Query-farm/vgi-rpc-go v0.30.0
 	github.com/apache/arrow-go/v18 v18.6.0
 )
