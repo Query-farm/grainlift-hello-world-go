@@ -4,13 +4,20 @@ A runnable Go worker built with [grainlift-go](https://github.com/Query-farm/gra
 
 ## Status
 
-HTTP and HTTPS work with published VGI Go v0.28.0. TCP, mTLS TCP, and Iroh are implemented and tested against prepared upstream fixes, but **fail closed with the published dependency** until its network-safety release is integrated. See [raw transport development](#raw-transport-development).
+HTTP, HTTPS, loopback TCP, mTLS TCP, and Iroh use published
+[VGI Go v0.30.0](https://github.com/Query-farm/vgi-rpc-go/releases/tag/v0.30.0),
+which includes the network-safe serving entrypoint. The example still uses a
+Go workspace when developing against the sibling Grainlift Go SDK.
 
 The synthetic backend supports `QUERY`, `FAIL`, schema inference, and autocommit. Transactions, preparation, binding, metadata, and other optional capabilities return ADBC `NOT_IMPLEMENTED`. The SDK has positive fixture coverage for those hooks; this example is not a database or a production certification.
 
+The example tests keep two independent connections and cursors open together, then release one while checking that the other's batches and close accounting remain correct. Cross-client commit visibility and write contention are outside this stateless worker's capabilities.
+
 ## Quickstart
 
-Requires Go 1.26 or newer and OpenSSL for the token-generation command. Use a fresh workspace; the example imports the sibling SDK without pinning an unreleased module version:
+Requires Go 1.26 or newer and OpenSSL for the token-generation command. Use a
+fresh workspace to develop against the sibling SDK; `go.mod` records a specific
+SDK commit for standalone reproducibility:
 
 ```sh
 mkdir grainlift-go-workspace
@@ -122,25 +129,12 @@ Set `GRAINLIFT_HELLO_IROH_CLIENT_ID` to the native client's endpoint public key 
 
 Readiness adds `endpoint_id` and `direct_address`. For this relay-disabled local example, pass the advertised address as `grainlift.iroh.direct_address`. The bridge uses a private Unix upstream socket. The bridge and same-UID processes are trusted. Startup failure and shutdown reap the child process; unexpected bridge exit stops the worker.
 
-### Raw transport development
+### Raw transport validation
 
-The declared VGI v0.28.0 dependency lacks the safe network entrypoint that disables shared-memory negotiation. It also needs parameter row-count and dynamic-header reflection fixes. Raw hosting therefore fails closed until the upstream release is integrated.
-
-For an explicit development build using the prepared upstream branch, from the workspace directory:
-
-```sh
-git clone --branch grainlift-network-safety \
-  https://github.com/Query-farm/vgi-rpc-go.git
-go work use ./vgi-rpc-go
-cd grainlift-go
-GRAINLIFT_REQUIRE_NETWORK=1 GRAINLIFT_REQUIRE_CANONICAL_HEADER=1 \
-  go test -race -count=1 ./...
-cd ../grainlift-hello-world-go
-GRAINLIFT_REQUIRE_NETWORK=1 go test -race -count=1 ./...
-go build -o grainlift-hello-world-go .
-```
-
-The manifest contains no local replacement. CI's optional `transport_ref` input selects an explicit upstream revision for all five transport checks; default CI uses the published dependency and checks HTTP/HTTPS.
+The declared VGI v0.30.0 dependency disables shared-memory negotiation on
+network streams and validates parameter rows and dynamic headers. CI requires
+that network-safe entrypoint and runs native ADBC conformance over all five
+transports with the published dependency. No local VGI replacement is needed.
 
 ## Limits and deployment
 
