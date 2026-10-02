@@ -1,7 +1,7 @@
-github.com/Query-farm/grainlift-go v0.1.1-0.20260930184527-b5b1b8c78182 h1:4vE3e5umfxS+CQx03LRN1wD6j/lcDh0B9xgsX2J3vVM=
-github.com/Query-farm/grainlift-go v0.1.1-0.20260930184527-b5b1b8c78182/go.mod h1:9G4nKaWcg6ggLvfEwbbcSOZ7zeVDvv7Snr/9bz7Q4Kg=
-github.com/Query-farm/vgi-rpc-go v0.30.0 h1:0Dv34nptNG7OkhAM+rEpZX2MMxUfcUUPs12rMZ2WE8U=
-github.com/Query-farm/vgi-rpc-go v0.30.0/go.mod h1:/7M2bvcmgZ56Cb8qsxlC8AmpNU3s/k2vcmKvxqM778U=
+github.com/Query-farm/grainlift-go v0.2.1 h1:9szWlIueb6YCdVfa4FnkW9mE0Ljgxs65Q06cjzbH4nE=
+github.com/Query-farm/grainlift-go v0.2.1/go.mod h1:X0aAq6BD5wz4obveWs4708Zf9PbPfc9/pZSPV/z6Py0=
+github.com/Query-farm/vgi-rpc-go v0.30.1 h1:QC4/JZUr4QIgwBpLaOs31xfNfPvDkAK4pjt1LhIttaw=
+github.com/Query-farm/vgi-rpc-go v0.30.1/go.mod h1:/7M2bvcmgZ56Cb8qsxlC8AmpNU3s/k2vcmKvxqM778U=
 github.com/andybalholm/brotli v1.2.2 h1:HzTuoo2ErYQqf5qvcJInB8uvqSVxRttzkFexPWtnceM=
 github.com/andybalholm/brotli v1.2.2/go.mod h1:rzTDkvFWvIrjDXZHkuS16NPggd91W3kUSvPlQ1pLaKY=
 github.com/apache/arrow-adbc/go/adbc v1.12.0 h1:1S7h8M12a+JZPuduuBo0kIQIRq+4heUikMnHBQ9seXE=

@@ -78,6 +78,7 @@ Any other ADBC driver manager works the same way, for example Python's
 | [`hello`](hello/hello.go) | The service: `Backend` → `Connection` → `Statement`, plus the two result styles below |
 | [`main`](main.go) | The `grainlift-hello-world-go` command |
 | [`examples/client`](examples/client/main.go) | A Go ADBC client |
+| [`cmd/conformance-worker`](cmd/conformance-worker/main.go) | The Go worker for Grainlift's [shared conformance suite](https://github.com/Query-farm/grainlift/tree/main/validation/conformance) |
 
 The service answers three queries:
 
@@ -171,6 +172,22 @@ running `examples/query.sql` in the Haybarn CLI (`$HAYBARN`, `haybarn` on
 `PATH`, or `uvx haybarn-cli`), which downloads the `adbc_scanner` extension on
 first use. CI builds a pinned native-driver revision and runs everything on
 Linux and macOS.
+
+### Shared conformance
+
+`cmd/conformance-worker` implements the worker process contract of
+Grainlift's shared conformance suite (`validation/conformance` in the grainlift
+repository): the synthetic `QUERY`/`FAIL` workload over HTTP, HTTPS, TCP, mTLS
+and Iroh, plus the request-limit and object-storage contract
+(`--max-request-bytes`, `--storage-*`, and the `STORE`/`STORED` commands). From
+a grainlift checkout:
+
+    go build -o /tmp/conformance-worker ./cmd/conformance-worker   # in this repository
+    python -m pytest validation/conformance -q \
+      --native-driver "$PWD/target/release/libadbc_driver_grainlift.so" \
+      --worker-command '["/tmp/conformance-worker"]'
+
+CI runs the suite on every transport.
 
 To develop against a local SDK checkout, use an uncommitted Go workspace:
 `go work init . ../grainlift-go`.

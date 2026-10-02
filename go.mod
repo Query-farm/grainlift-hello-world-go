@@ -3,13 +3,13 @@ module github.com/Query-farm/grainlift-hello-world-go
 go 1.26.0
 
 require (
-	github.com/Query-farm/grainlift-go v0.1.1-0.20260930184527-b5b1b8c78182
+	github.com/Query-farm/grainlift-go v0.2.1
+	github.com/Query-farm/vgi-rpc-go v0.30.1
 	github.com/apache/arrow-adbc/go/adbc v1.12.0
 	github.com/apache/arrow-go/v18 v18.7.0
 )
 
 require (
-	github.com/Query-farm/vgi-rpc-go v0.30.0 // indirect
 	github.com/andybalholm/brotli v1.2.2 // indirect
 	github.com/apache/thrift v0.24.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect

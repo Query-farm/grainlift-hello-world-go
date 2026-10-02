@@ -28,4 +28,4 @@ FROM adbc_scan(getvariable('hello')::BIGINT, 'SELECT * FROM running_total(2500)'
 ORDER BY number DESC
 LIMIT 3;
 
-SELECT adbc_disconnect(getvariable('hello')::BIGINT);
+CALL adbc_disconnect(getvariable('hello')::BIGINT);
